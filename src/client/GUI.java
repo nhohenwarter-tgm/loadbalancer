@@ -14,6 +14,7 @@ public class GUI {
 
     private JTextField in_ip;
     private JTextField in_requestssec;
+    private JTextField in_clientname;
     private JButton button_start;
     private JButton button_stop;
     private JButton button_close;
@@ -61,12 +62,27 @@ public class GUI {
         this.in_requestssec.setMaximumSize(new Dimension(300,30));
         panelRequestssec.add(this.in_requestssec);
 
+        /** PANEL FOR INPUT OF CLIENTNAME */
+        JPanel panelClientname = new JPanel();
+        panelClientname.setLayout(new BoxLayout(panelClientname, BoxLayout.LINE_AXIS));
+        panelClientname.add(new JLabel("Client Name"));
+        panelClientname.add(Box.createRigidArea(new Dimension(58,0)));
+        this.in_clientname = new JTextField(15);
+        this.in_clientname.setMaximumSize(new Dimension(300,30));
+        panelClientname.add(this.in_clientname);
+
         /** PANEL FOR CONTROL BUTTONS */
         JPanel panelButtons = new JPanel();
         panelButtons.setLayout(new BoxLayout(panelButtons, BoxLayout.LINE_AXIS));
         this.button_start = new JButton("Start");
+        this.button_start.setActionCommand("button_start");
+        this.button_start.addActionListener(this.c);
         this.button_stop = new JButton("Stop");
+        this.button_stop.setActionCommand("button_stop");
+        this.button_stop.addActionListener(this.c);
         this.button_close = new JButton("Close");
+        this.button_close.setActionCommand("button_close");
+        this.button_close.addActionListener(this.c);
         panelButtons.add(this.button_start);
         panelButtons.add(Box.createRigidArea(new Dimension(30,0)));
         panelButtons.add(this.button_stop);
@@ -111,6 +127,8 @@ public class GUI {
         panelContent.add(panelIp);
         panelContent.add(Box.createRigidArea(new Dimension(0,10)));
         panelContent.add(panelRequestssec);
+        panelContent.add(Box.createRigidArea(new Dimension(0,10)));
+        panelContent.add(panelClientname);
         panelContent.add(Box.createRigidArea(new Dimension(0,20)));
         panelContent.add(panelButtons);
         panelContent.add(Box.createRigidArea(new Dimension(0,80)));
@@ -121,6 +139,26 @@ public class GUI {
         this.frame.add(mainPanel);
 
         this.frame.setVisible(true);
+    }
+
+    public String getIp(){
+        return this.in_ip.getText();
+    }
+
+    public String getRequestssec(){
+        return this.in_requestssec.getText();
+    }
+
+    public String getClientname(){
+        return this.in_clientname.getText();
+    }
+
+    public void addOutRequests(String text){
+        this.out_requests.append(text);
+    }
+
+    public void addOutResponse(String text){
+        this.out_response.append(text);
     }
 
 }
