@@ -9,7 +9,7 @@ import java.rmi.RemoteException;
  * @author Niklas Hohenwarter
  * @author Selina Brinnich
  * 
- * @version 2015-01-08
+ * @version 2016-03-03
  *
  * @see http://stackoverflow.com/a/17899007
  *
@@ -22,11 +22,20 @@ public class CalculatorImpl implements Calculator, Serializable {
 	private static final BigDecimal FOUR = new BigDecimal("4");
 	private static final BigDecimal FIVE = new BigDecimal("5");
 	private static final BigDecimal TWO_THIRTY_NINE = new BigDecimal("239");
-	
+
+	/**
+	 * Initialisiert die Calculator-Implementierung
+	 */
 	public CalculatorImpl() {
 		super();
 	}
 
+	/**
+	 * Berechnet die Zahl Pi auf eine bestimmte Anzahl an Stellen
+	 *
+	 * @param anzahl_nachkommastellen anzahl der Stellen
+	 * @return berechnetes Pi
+	 */
 	@Override
 	public BigDecimal pi(int anzahl_nachkommastellen) throws RemoteException {
 		int calcDigits = anzahl_nachkommastellen + 10;
@@ -37,6 +46,12 @@ public class CalculatorImpl implements Calculator, Serializable {
 				RoundingMode.DOWN);
 	}
 
+	/**
+	 * Hilfsfunktion fuer die Berechnung von Pi
+	 * @param x die zu berechnende Zahl
+	 * @param numDigits die Anzahl der zu berechnenden Stellen
+	 * @return arccot
+	 */
 	private static BigDecimal arccot(BigDecimal x, int numDigits) {
 
 		BigDecimal unity = BigDecimal.ONE

@@ -10,12 +10,13 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Dient als Load-Balancer fuer Client-Anfragen an Pi-Calculation-Server. Der Load-Balancer wurde mittels Round Robin
- * Algorithmus umgesetzt. Server koennen sich jederzeit am Load-Balancer anmelden bzw. abmelden.
+ * Dient als Load-Balancer fuer Client-Anfragen an Pi-Calculation-Server. Der Load-Balancer wurde mittels Round Robin,
+ * Reponse Time und Weighted Distribution Algorithmus umgesetzt. Server koennen sich jederzeit am Load-Balancer
+ * anmelden bzw. abmelden.
  * 
  * @author Niklas Hohenwarter
  * @author Selina Brinnich
- * @version 2015-01-08
+ * @version 2016-03-03
  *
  */
 public class CalculatorBalancer implements Calculator, Administration {
@@ -35,8 +36,7 @@ public class CalculatorBalancer implements Calculator, Administration {
 	private static final int ALG_WEIGHTEDDISTRIB = 2;
 	
 	/**
-	 * Initialisiert eine neue HashMap die alle angemeldeten Server verwaltet und einen Iterator zur Umsetzung des
-	 * Round Robin Algorithmus
+	 * Initialisiert alle Listen und Iterator, die fuer die 3 implementierten Loadbalancing-Algorithmen notwendig sind
 	 */
 	public CalculatorBalancer(int algorithm) {
 		server = new HashMap<String,Calculator>();
@@ -48,10 +48,10 @@ public class CalculatorBalancer implements Calculator, Administration {
 		nextweight = 1;
 		CalculatorBalancer.algorithm = algorithm;
 	}
-	
+
 	/**
-	 * Gibt den naechsten Server in der Liste zurueck
-	 * @return den naechsten Server der Liste
+	 * Sucht sich einen passenden Server anhand des definierten Loadbalancing-Algorithmus
+	 * @return den Namen des zu verwendenden Servers
 	 */
 	public synchronized String balance(){
 		if(server.size()>0){
@@ -69,7 +69,8 @@ public class CalculatorBalancer implements Calculator, Administration {
 	}
 
 	/**
-	 *
+	 * Implementiert einen Round Robin Algorithmus
+	 * @return den Namen des zu verwendenden Servers
 	 */
 	public synchronized String balance_roundrobin(){
 		if(!it_server.hasNext()){
@@ -79,7 +80,8 @@ public class CalculatorBalancer implements Calculator, Administration {
 	}
 
 	/**
-	 *
+	 * Implementiert einen Response Time Algorithmus
+	 * @return den Namen des zu verwendenden Servers
 	 */
 	public synchronized String balance_responsetime(){
 		long least = -1;
@@ -112,7 +114,8 @@ public class CalculatorBalancer implements Calculator, Administration {
 	}
 
 	/**
-	 *
+	 * Implementiert einen Weighted Distribution Algorithmus
+	 * @return den Namen des zu verwendenden Servers
 	 */
 	public synchronized String balance_weighteddistrib(){
 		if(!it_current_server_weighted.hasNext()) {
@@ -123,7 +126,7 @@ public class CalculatorBalancer implements Calculator, Administration {
 
 
 	/**
-	 * Sucht sich einen freien Server und laesst diesen Pi berechnen
+	 * Sucht sich einen Server und laesst diesen Pi berechnen
 	 * @param anzahl_nachkommastellen die Anzahl der Nachkommastellen, bis zu denen Pi berechnet werden soll
 	 */
 	@Override
@@ -150,6 +153,7 @@ public class CalculatorBalancer implements Calculator, Administration {
 	 * Meldet einen neuen Server am Load-Balancer an
 	 * @param stub ein exportiertes Objekt des Servers
 	 * @param name der Name unter dem der Server gespeichert werden soll
+	 * @param ip   die IP, auf der der Server laeuft
 	 */
 	@Override
 	public synchronized void register(Calculator stub, String name, String ip){
@@ -250,6 +254,19 @@ public class CalculatorBalancer implements Calculator, Administration {
 			registry.rebind("PiCalculationBalancer-Client", stubC);
 			registry.rebind("PiCalculationBalancer-Server", stubA);
             System.out.println("Balancer successfully bound with IP "+getIp());
+			String alg = "";
+			switch(number){
+				case CalculatorBalancer.ALG_ROUNDROBIN:
+					alg = "Round Robin";
+					break;
+				case CalculatorBalancer.ALG_RESPONSETIME:
+					alg = "Response Time";
+					break;
+				case CalculatorBalancer.ALG_WEIGHTEDDISTRIB:
+					alg = "Weighted Distribution";
+					break;
+			}
+			System.out.println("Balancer using algorithm " + alg);
 		} catch (Exception e) {
 			System.err.println("Balancer bind failed:");
 			e.printStackTrace();
